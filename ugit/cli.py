@@ -3,6 +3,7 @@ import os
 import sys
 
 from . import data
+from . import base
 
 def main():
     args = parse_args()
