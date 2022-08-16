@@ -75,6 +75,11 @@ def _empty_current_directory():
 
 def commit(message):
     commit_ = f'tree {write_tree()}\n'
+
+    HEAD = data.get_HEAD()
+    if HEAD:
+        commit_ += f'parent {HEAD}\n'
+
     commit_ += '\n'
     commit_ += f'{message}\n'
 
