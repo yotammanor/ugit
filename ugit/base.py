@@ -73,6 +73,14 @@ def _empty_current_directory():
                 pass  # ignored file in dir
 
 
+def commit(message):
+    commit_ = f'tree {write_tree()}\n'
+    commit_ += '\n'
+    commit_ += f'{message}\n'
+
+    return data.hash_object(commit_.encode(), 'commit')
+
+
 def is_ignored(path):
     path = path.replace('\\', '/')
     return (
