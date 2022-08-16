@@ -3,9 +3,11 @@ import hashlib
 
 GIT_DIR = '.ugit'
 
+
 def init():
     os.makedirs(GIT_DIR, exist_ok=True)
     os.makedirs(f'{GIT_DIR}/objects', exist_ok=True)
+
 
 def hash_object(data, type_='blob'):
     obj = type_.encode() + b'\x00' + data
@@ -13,6 +15,7 @@ def hash_object(data, type_='blob'):
     with open(f'{GIT_DIR}/objects/{oid}', 'wb') as out:
         out.write(obj)
     return oid
+
 
 def get_object(oid, expected='blob'):
     with open(f'{GIT_DIR}/objects/{oid}', 'rb') as f:
@@ -23,3 +26,8 @@ def get_object(oid, expected='blob'):
     if expected is not None:
         assert type_ == expected, f'Expected {expected}, got {type_}'
     return content
+
+
+def set_HEAD(oid):
+    with open(f'{GIT_DIR}/HEAD', 'w') as f:
+        f.write(oid)
