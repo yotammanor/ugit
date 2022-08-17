@@ -18,7 +18,7 @@ def create_tag(name, oid):
 def checkout(oid):
     commit_ = get_commit(oid)
     read_tree(commit_.tree)
-    data.set_HEAD(oid)
+    data.update_ref("HEAD", oid)
 
 
 def get_commit(oid):
@@ -114,7 +114,7 @@ def _empty_current_directory():
 def commit(message):
     commit_ = f'tree {write_tree()}\n'
 
-    HEAD = data.get_HEAD()
+    HEAD = data.get_ref("HEAD")
     if HEAD:
         commit_ += f'parent {HEAD}\n'
 
@@ -122,7 +122,7 @@ def commit(message):
     commit_ += f'{message}\n'
 
     oid = data.hash_object(commit_.encode(), 'commit')
-    data.set_HEAD(oid)
+    data.update_ref("HEAD", oid)
     return oid
 
 
