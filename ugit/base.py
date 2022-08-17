@@ -10,6 +10,11 @@ from collections import namedtuple
 Commit = namedtuple('Commit', ['tree', 'parent', 'message'])
 
 
+def create_tag(name, oid):
+    # TODO: implement
+    pass
+
+
 def checkout(oid):
     commit_ = get_commit(oid)
     read_tree(commit_.tree)
