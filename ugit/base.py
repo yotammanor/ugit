@@ -1,4 +1,4 @@
-import os
+import string
 
 from . import data
 import itertools
@@ -126,7 +126,21 @@ def commit(message):
 
 
 def get_oid(name):
-    return data.get_ref(name) or name
+    refs_to_try = [
+        f'{name}',
+        f'refs/{name}',
+        f'refs/tags/{name}',
+        f'refs/heads/{name}'
+    ]
+    for ref in refs_to_try:
+        if oid := data.get_ref(ref):
+            return oid
+    
+    is_hex = all(c in string.hexdigits for c in name)
+    if len(name) == 40 and is_hex:
+        return name
+
+    raise AssertionError(f'Unknown name {name}')
 
 
 def is_ignored(path):
