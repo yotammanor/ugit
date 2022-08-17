@@ -126,6 +126,9 @@ def commit(message):
 
 
 def get_oid(name):
+    if name == '@':
+        name = 'HEAD'
+
     refs_to_try = [
         f'{name}',
         f'refs/{name}',
@@ -135,7 +138,7 @@ def get_oid(name):
     for ref in refs_to_try:
         if oid := data.get_ref(ref):
             return oid
-    
+
     is_hex = all(c in string.hexdigits for c in name)
     if len(name) == 40 and is_hex:
         return name
