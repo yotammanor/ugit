@@ -1,6 +1,33 @@
 import os
 
 from . import data
+import itertools
+import operator
+import os
+
+from collections import namedtuple
+
+Commit = namedtuple('Commit', ['tree', 'parent', 'message'])
+
+
+def get_commit(oid):
+    parent = None
+    tree = None
+    commit_ = data.get_object(oid, 'commit').decode()
+    lines = iter(commit_.splitlines())
+    for line in itertools.takewhile(operator.truth,
+                                    lines):  # this works because there's an empty line between the key-value pairs and the message
+        key, value = line.split(' ', 1)
+        if key == 'tree':
+            tree = value
+        elif key == 'parent':
+            parent = value
+        else:
+            raise AssertionError(f'Unknown field {key}')
+
+    assert tree is not None, 'Expected tree to be defined'
+    message = '\n'.join(lines)
+    return Commit(tree=tree, parent=parent, message=message)
 
 
 def write_tree(directory='.'):
