@@ -125,6 +125,10 @@ def commit(message):
     return oid
 
 
+def get_oid(name):
+    return data.get_ref(name) or name
+
+
 def is_ignored(path):
     path = path.replace('\\', '/')
     return (
