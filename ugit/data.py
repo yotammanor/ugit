@@ -29,11 +29,14 @@ def get_object(oid, expected='blob'):
 
 
 def update_ref(ref, oid):
-    with open(f'{GIT_DIR}/{ref}', 'w') as f:
+    ref_path = f'{GIT_DIR}/{ref}'
+    os.makedirs(os.path.dirname(ref_path), exist_ok=True)
+    with open(ref_path, 'w') as f:
         f.write(oid)
 
 
 def get_ref(ref):
-    if os.path.isfile(f'{GIT_DIR}/{ref}'):
-        with open(f'{GIT_DIR}/{ref}') as f:
+    ref_path = f'{GIT_DIR}/{ref}'
+    if os.path.isfile(ref_path):
+        with open(ref_path) as f:
             return f.read().strip()

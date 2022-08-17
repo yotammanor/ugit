@@ -11,8 +11,7 @@ Commit = namedtuple('Commit', ['tree', 'parent', 'message'])
 
 
 def create_tag(name, oid):
-    # TODO: implement
-    pass
+    data.update_ref(f'refs/tags/{name}', oid)
 
 
 def checkout(oid):
