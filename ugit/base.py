@@ -146,6 +146,21 @@ def get_oid(name):
     raise AssertionError(f'Unknown name {name}')
 
 
+def iter_commits_and_parents(oids):
+    oids = set(oids)
+    visited = set()
+
+    while oids:
+        oid = oids.pop()
+        if not oid or oid in visited:
+            continue
+        visited.add(oid)
+        yield oid
+
+        commit_ = get_commit(oid)
+        oids.add(commit_.parent)
+
+
 def is_ignored(path):
     path = path.replace('\\', '/')
     return (

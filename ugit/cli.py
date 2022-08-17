@@ -105,6 +105,16 @@ def checkout(args):
 def tag(args):
     base.create_tag(args.name, args.oid)
 
+
 def k(args):
+    oids = set()
+
     for refname, ref in data.iter_refs():
         print(refname, ref)
+        oids.add(ref)
+
+    for oid in base.iter_commits_and_parents(oids):
+        commit_ = base.get_commit(oid)
+        print(oid)
+        if commit_.parent:
+            print('  Parent', commit_.parent)
