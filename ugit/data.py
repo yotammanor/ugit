@@ -37,15 +37,21 @@ def update_ref(ref, oid):
 
 def get_ref(ref):
     ref_path = f'{GIT_DIR}/{ref}'
+    value = None
     if os.path.isfile(ref_path):
         with open(ref_path) as f:
-            return f.read().strip()
+            value = f.read().strip()
+
+    if value and value.startswith('ref:'):
+        return get_ref(value.split(':', 1)[1].strip())
+
+    return value
 
 
 def iter_refs():
     refs = ['HEAD']
     for root, _, filenames in os.walk(f'{GIT_DIR}/refs/'):
-        root = os.path.relpath(root, GIT_DIR).replace('\\','/')
+        root = os.path.relpath(root, GIT_DIR).replace('\\', '/')
         refs.extend(f'{root}/{name}' for name in filenames)
 
     for refname in refs:
