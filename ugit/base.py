@@ -10,10 +10,6 @@ from collections import deque, namedtuple
 Commit = namedtuple('Commit', ['tree', 'parent', 'message'])
 
 
-def create_tag(name, oid):
-    data.update_ref(f'refs/tags/{name}', oid)
-
-
 def checkout(oid):
     commit_ = get_commit(oid)
     read_tree(commit_.tree)
@@ -108,6 +104,14 @@ def _empty_current_directory():
                 os.rmdir(path)
             except (FileNotFoundError, OSError):
                 pass  # ignored file in dir
+
+
+def create_branch(name, oid):
+    data.update_ref(f'refs/heads/{name}', oid)
+
+
+def create_tag(name, oid):
+    data.update_ref(f'refs/tags/{name}', oid)
 
 
 def commit(message):
