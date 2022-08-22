@@ -13,7 +13,7 @@ Commit = namedtuple('Commit', ['tree', 'parent', 'message'])
 def checkout(oid):
     commit_ = get_commit(oid)
     read_tree(commit_.tree)
-    data.update_ref("HEAD", oid)
+    data.update_ref("HEAD", data.RefValue(symbolic=False, value=oid))
 
 
 def get_commit(oid):
@@ -107,17 +107,17 @@ def _empty_current_directory():
 
 
 def create_branch(name, oid):
-    data.update_ref(f'refs/heads/{name}', oid)
+    data.update_ref(f'refs/heads/{name}', data.RefValue(symbolic=False, value=oid))
 
 
 def create_tag(name, oid):
-    data.update_ref(f'refs/tags/{name}', oid)
+    data.update_ref(f'refs/tags/{name}', data.RefValue(symbolic=False, value=oid))
 
 
 def commit(message):
     commit_ = f'tree {write_tree()}\n'
 
-    HEAD = data.get_ref("HEAD")
+    HEAD = data.get_ref("HEAD").value
     if HEAD:
         commit_ += f'parent {HEAD}\n'
 
@@ -125,7 +125,7 @@ def commit(message):
     commit_ += f'{message}\n'
 
     oid = data.hash_object(commit_.encode(), 'commit')
-    data.update_ref("HEAD", oid)
+    data.update_ref("HEAD", data.RefValue(symbolic=False, value=oid))
     return oid
 
 
@@ -140,7 +140,7 @@ def get_oid(name):
         f'refs/heads/{name}'
     ]
     for ref in refs_to_try:
-        if oid := data.get_ref(ref):
+        if oid := data.get_ref(ref).value:
             return oid
 
     is_hex = all(c in string.hexdigits for c in name)

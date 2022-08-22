@@ -1,7 +1,10 @@
 import os
 import hashlib
+from collections import namedtuple
 
 GIT_DIR = '.ugit'
+
+RefValue = namedtuple('RefValue', ['symbolic', 'value'])
 
 
 def init():
@@ -28,14 +31,15 @@ def get_object(oid, expected='blob'):
     return content
 
 
-def update_ref(ref, oid):
+def update_ref(ref, value: RefValue):
+    assert not value.symbolic
     ref_path = f'{GIT_DIR}/{ref}'
     os.makedirs(os.path.dirname(ref_path), exist_ok=True)
     with open(ref_path, 'w') as f:
-        f.write(oid)
+        f.write(value.value)
 
 
-def get_ref(ref):
+def get_ref(ref) -> RefValue:
     ref_path = f'{GIT_DIR}/{ref}'
     value = None
     if os.path.isfile(ref_path):
@@ -45,7 +49,7 @@ def get_ref(ref):
     if value and value.startswith('ref:'):
         return get_ref(value.split(':', 1)[1].strip())
 
-    return value
+    return RefValue(symbolic=False, value=value)
 
 
 def iter_refs():
