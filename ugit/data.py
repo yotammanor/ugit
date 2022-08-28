@@ -60,8 +60,9 @@ def _get_ref_internal(ref, deref):
     symbolic = bool(value) and value.startswith('ref:')
     if symbolic:
         value = value.split(':', 1)[1].strip()
-        return _get_ref_internal(value, deref)
-    return ref, RefValue(symbolic=False, value=value)
+        if deref:
+            return _get_ref_internal(value, deref=True)
+    return ref, RefValue(symbolic=symbolic, value=value)
 
 
 def iter_refs(deref=True):
