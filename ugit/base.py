@@ -10,10 +10,21 @@ from collections import deque, namedtuple
 Commit = namedtuple('Commit', ['tree', 'parent', 'message'])
 
 
-def checkout(oid):
+def checkout(name):
+    oid = get_oid(name)
     commit_ = get_commit(oid)
     read_tree(commit_.tree)
-    data.update_ref("HEAD", data.RefValue(symbolic=False, value=oid))
+
+    if is_branch(name):
+        HEAD = data.RefValue(symbolic=True, value=f'refs/heads/{name}')
+    else:
+        HEAD = data.RefValue(symbolic=False, value=oid)
+
+    data.update_ref("HEAD", HEAD, deref=False)
+
+
+def is_branch(name):
+    return data.get_ref(f'refs/heads/{name}').value is not None
 
 
 def get_commit(oid):

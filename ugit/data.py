@@ -32,7 +32,6 @@ def get_object(oid, expected='blob'):
 
 
 def update_ref(ref, value: RefValue, deref=True):
-    assert not value.symbolic
     ref = _get_ref_internal(ref, deref)[0]
 
     assert value.value
