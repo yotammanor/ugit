@@ -136,6 +136,10 @@ def _empty_current_directory():
                 pass  # ignored file in dir
 
 
+def reset(oid):
+    data.update_ref('HEAD', data.RefValue(symbolic=False, value=oid))
+
+
 def create_branch(name, oid):
     data.update_ref(f'refs/heads/{name}', data.RefValue(symbolic=False, value=oid))
 

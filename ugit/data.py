@@ -49,7 +49,7 @@ def get_ref(ref, deref=True) -> RefValue:
     return _get_ref_internal(ref, deref)[1]
 
 
-def _get_ref_internal(ref, deref):
+def _get_ref_internal(ref: str, deref: bool) -> tuple[str, RefValue]:
     ref_path = f'{GIT_DIR}/{ref}'
     value = None
     if os.path.isfile(ref_path):
