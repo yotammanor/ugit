@@ -10,6 +10,11 @@ from collections import deque, namedtuple
 Commit = namedtuple('Commit', ['tree', 'parent', 'message'])
 
 
+def init():
+    data.init()
+    data.update_ref('HEAD', data.RefValue(symbolic=True, value='refs/heads/master'))
+
+
 def checkout(name):
     oid = get_oid(name)
     commit_ = get_commit(oid)
