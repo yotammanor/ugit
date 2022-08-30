@@ -15,6 +15,15 @@ def init():
     data.update_ref('HEAD', data.RefValue(symbolic=True, value='refs/heads/master'))
 
 
+def get_branch_name():
+    HEAD = data.get_ref('HEAD', deref=False)
+    if not HEAD.symbolic:
+        return None
+    HEAD = HEAD.value
+    assert HEAD.startswith('refs/heads'), f'expected HEAD to start with "refs/heads", found {HEAD.value}'
+    return os.path.relpath(HEAD, 'refs/heads')
+
+
 def checkout(name):
     oid = get_oid(name)
     commit_ = get_commit(oid)
