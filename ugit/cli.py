@@ -4,7 +4,7 @@ import subprocess
 import sys
 import textwrap
 
-from . import data
+from . import data, diff
 from . import base
 
 
@@ -124,8 +124,15 @@ def _print_commit(oid, commit, refs: list[str] = None):
 def show(args):
     if not args.oid:
         return
-    commit_ = base.get_commit(args.oid)
-    _print_commit(args.oid, commit_)
+    commit = base.get_commit(args.oid)
+    parent_tree = None
+    if commit.parent:
+        parent_tree = base.get_commit(commit.parent).tree
+    _print_commit(args.oid, commit)
+    result = diff.diff_trees(
+        base.get_tree(parent_tree), base.get_tree(commit.tree)
+    )
+    print(result)
 
 
 def checkout(args):

@@ -9,4 +9,5 @@ setup(name='ugit',
           'console_scripts': [
               'ugit = ugit.cli:main'
           ]
-      })
+      },
+      requires=['typing_extensions'])
