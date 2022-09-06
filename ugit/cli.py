@@ -39,7 +39,7 @@ def parse_args():
     read_tree_parser.add_argument('tree', type=oid)
 
     commit_parser = commands.add_parser('commit')
-    commit_parser.set_defaults(func=commit)
+    commit_parser.set_defaults(func=commit_func)
     commit_parser.add_argument('-m', '--message', required=True)
 
     log_parser = commands.add_parser('log')
@@ -100,7 +100,7 @@ def read_tree(args):
     base.read_tree(args.tree)
 
 
-def commit(args):
+def commit_func(args):
     print(base.commit(args.message))
 
 
@@ -110,14 +110,14 @@ def log(args):
         refs.setdefault(ref.value, []).append(refname)
 
     for oid in base.iter_commits_and_parents({args.oid}):
-        commit_ = base.get_commit(oid)
-        _print_commit(oid, commit_, refs.get(oid))
+        commit = base.get_commit(oid)
+        _print_commit(oid, commit, refs.get(oid))
 
 
-def _print_commit(oid, commit_, refs: list[str] = None):
+def _print_commit(oid, commit, refs: list[str] = None):
     refs_str = f' ({", ".join(refs)})' if refs else ''
     print(f'commit {oid}{refs_str}\n')
-    print(textwrap.indent(commit_.message, '    '))
+    print(textwrap.indent(commit.message, '    '))
     print('')
 
 
@@ -159,10 +159,10 @@ def k(args):
             oids.add(ref.value)
 
     for oid in base.iter_commits_and_parents(oids):
-        commit_ = base.get_commit(oid)
+        commit = base.get_commit(oid)
         dot += f'"{oid}" [shape=box style=filled label="{oid[:10]}"]\n'
-        if commit_.parent:
-            dot += f'"{oid}" -> "{commit_.parent}"\n'
+        if commit.parent:
+            dot += f'"{oid}" -> "{commit.parent}"\n'
 
     dot += '}'
 
