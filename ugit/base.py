@@ -1,13 +1,22 @@
 import string
+from typing import NamedTuple, TypeAlias
 
 from . import data
 import itertools
 import operator
 import os
 
-from collections import deque, namedtuple
+from collections import deque
 
-Commit = namedtuple('Commit', ['tree', 'parent', 'message'])
+Path: TypeAlias = str
+OID: TypeAlias = str
+TreeMap: TypeAlias = dict[Path, OID]
+
+
+class Commit(NamedTuple):
+    tree: OID
+    parent: OID
+    message: str
 
 
 def init():
@@ -96,7 +105,7 @@ def _iter_tree_entries(oid):
         yield type_, oid, name
 
 
-def get_tree(oid, base_path=''):
+def get_tree(oid: OID, base_path: Path = '') -> TreeMap:
     result = {}
     for type_, oid, name in _iter_tree_entries(oid):
         assert '/' not in name
