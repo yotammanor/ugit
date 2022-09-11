@@ -1,6 +1,6 @@
 import subprocess
 from collections import defaultdict
-from typing import Iterable
+from typing import Iterable, TypeAlias, Literal
 from typing_extensions import Unpack
 from tempfile import NamedTemporaryFile as Temp
 from ugit import base
@@ -24,6 +24,18 @@ def diff_trees(t_from: base.TreeMap, t_to: base.TreeMap) -> bytes:
         if o_from != o_to:
             output += diff_blobs(o_from, o_to, path)
     return output
+
+
+Action: TypeAlias = Literal['new_file', 'deleted', 'modified']
+
+
+def iter_changed_files(t_from: base.TreeMap, t_to: base.TreeMap) -> Iterable[tuple[base.Path, Action]]:
+    for path, o_from, o_to in compare_trees(t_from, t_to):
+        if o_from != o_to:
+            action = ('new_file' if not o_from else
+                      'deleted' if not o_to else
+                      'modified')
+            yield path, action
 
 
 def diff_blobs(o_from: base.OID, o_to: base.OID, path='blob'):
