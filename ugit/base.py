@@ -128,7 +128,7 @@ def get_working_tree() -> TreeMap:
             if is_ignored(path) or not os.path.isfile(path):
                 continue
             with open(path, 'rb') as f:
-                fixed_path = path.replace('\\', '/') # window fix
+                fixed_path = path.replace('\\', '/')  # window fix
                 result[fixed_path] = data.hash_object(f.read())
     return result
 
@@ -168,6 +168,11 @@ def create_branch(name, oid):
 
 def create_tag(name, oid):
     data.update_ref(f'refs/tags/{name}', data.RefValue(symbolic=False, value=oid))
+
+
+def merge(other):
+    # TODO: merge HEAD into other
+    pass
 
 
 def commit(message):

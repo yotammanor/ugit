@@ -78,6 +78,10 @@ def parse_args():
     reset_parser.set_defaults(func=reset)
     reset_parser.add_argument('commit', type=oid)
 
+    merge_parser = commands.add_parser('merge')
+    merge_parser.set_defaults(func=merge_func)
+    merge_parser.add_argument('commit', type=oid)
+
     return parser.parse_args()
 
 
@@ -211,3 +215,7 @@ def diff_func(args):
     result = diff.diff_trees(base.get_tree(tree), base.get_working_tree())
     sys.stdout.flush()
     sys.stdout.buffer.write(result)
+
+
+def merge_func(args):
+    base.merge(args.commit)
