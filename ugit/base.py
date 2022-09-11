@@ -120,6 +120,19 @@ def get_tree(oid: OID, base_path: Path = '') -> TreeMap:
     return result
 
 
+def get_working_tree() -> TreeMap:
+    result = {}
+    for root, _, filenames in os.walk('.'):
+        for filename in filenames:
+            path = os.path.relpath(f'{root}/{filename}')
+            if is_ignored(path) or not os.path.isfile(path):
+                continue
+            with open(path, 'rb') as f:
+                fixed_path = path.replace('\\', '/') # window fix
+                result[fixed_path] = data.hash_object(f.read())
+    return result
+
+
 def read_tree(tree_oid):
     _empty_current_directory()
     for path, oid in get_tree(tree_oid, base_path='./').items():
