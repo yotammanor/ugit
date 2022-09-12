@@ -212,6 +212,7 @@ def reset(args):
 
 def diff_func(args):
     tree = args.commit and base.get_commit(args.commit).tree
+
     result = diff.diff_trees(base.get_tree(tree), base.get_working_tree())
     sys.stdout.flush()
     sys.stdout.buffer.write(result)

@@ -55,3 +55,29 @@ def diff_blobs(o_from: types.OID, o_to: types.OID, path='blob'):
             output, _ = proc.communicate()
 
         return output
+
+
+def merge_trees(t_head: types.TreeMap, t_other: types.TreeMap) -> types.BlobTreeMap:
+    tree = {}
+    for path, o_HEAD, o_other in compare_trees(t_head, t_other):
+        tree[path] = merge_blobs(o_HEAD, o_other)
+    return tree
+
+
+def merge_blobs(o_head: types.OID, o_other: types.OID) -> bytes:
+    with Temp() as f_HEAD, Temp() as f_other:
+        for oid, f in [(o_head, f_HEAD), (o_other, f_other)]:
+            if oid:
+                f.write(data.get_object(oid))
+                f.flush()
+
+        with subprocess.Popen(
+                [
+                    'diff',
+                    '-DHEAD', f_HEAD.name,
+                    f_other.name
+                ], stdout=subprocess.PIPE
+        ) as proc:
+            output, _ = proc.communicate()
+
+        return output

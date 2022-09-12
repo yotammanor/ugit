@@ -1,6 +1,6 @@
 import string
 
-from . import data
+from . import data, diff
 from . import types
 
 import itertools
@@ -46,7 +46,7 @@ def is_branch(name):
     return data.get_ref(f'refs/heads/{name}').value is not None
 
 
-def get_commit(oid):
+def get_commit(oid: types.OID) -> types.Commit:
     parent = None
     tree = None
     commit_ = data.get_object(oid, 'commit').decode()
@@ -161,9 +161,23 @@ def create_tag(name, oid):
     data.update_ref(f'refs/tags/{name}', data.RefValue(symbolic=False, value=oid))
 
 
+def read_tree_merged(t_head: types.OID, t_other: types.OID) -> None:
+    _empty_current_directory()
+    merged_tree = diff.merge_trees(get_tree(t_head), get_tree(t_other))
+    for path, blob in merged_tree.items():
+        os.makedirs(f'./{os.path.dirname(path)}', exist_ok=True)
+        with open(path, 'wb') as f:
+            f.write(blob)
+
+
 def merge(other):
-    # TODO: merge HEAD into other
-    pass
+    HEAD = data.get_ref('HEAD').value
+    assert HEAD
+    c_HEAD = get_commit(HEAD)
+    c_other = get_commit(other)
+
+    read_tree_merged(c_HEAD.tree, c_other.tree)
+    print('Merged in working tree')
 
 
 def commit(message):
