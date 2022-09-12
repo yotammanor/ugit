@@ -1,22 +1,13 @@
 import string
-from typing import NamedTuple, TypeAlias
 
 from . import data
+from . import types
+
 import itertools
 import operator
 import os
 
 from collections import deque
-
-Path: TypeAlias = str
-OID: TypeAlias = str
-TreeMap: TypeAlias = dict[Path, OID]
-
-
-class Commit(NamedTuple):
-    tree: OID
-    parent: OID
-    message: str
 
 
 def init():
@@ -72,7 +63,7 @@ def get_commit(oid):
 
     assert tree is not None, 'Expected tree to be defined'
     message = '\n'.join(lines)
-    return Commit(tree=tree, parent=parent, message=message)
+    return types.Commit(tree=tree, parent=parent, message=message)
 
 
 def write_tree(directory='.'):
@@ -105,7 +96,7 @@ def _iter_tree_entries(oid):
         yield type_, oid, name
 
 
-def get_tree(oid: OID, base_path: Path = '') -> TreeMap:
+def get_tree(oid: types.OID, base_path: types.Path = '') -> types.TreeMap:
     result = {}
     for type_, oid, name in _iter_tree_entries(oid):
         assert '/' not in name
@@ -120,7 +111,7 @@ def get_tree(oid: OID, base_path: Path = '') -> TreeMap:
     return result
 
 
-def get_working_tree() -> TreeMap:
+def get_working_tree() -> types.TreeMap:
     result = {}
     for root, _, filenames in os.walk('.'):
         for filename in filenames:

@@ -3,12 +3,12 @@ from collections import defaultdict
 from typing import Iterable, TypeAlias, Literal
 from typing_extensions import Unpack
 from tempfile import NamedTemporaryFile as Temp
-from ugit import base
 
+from . import types
 from . import data
 
 
-def compare_trees(*trees: Unpack[base.TreeMap]) -> Iterable[tuple[base.Path, Unpack[list[base.OID]]]]:
+def compare_trees(*trees: Unpack[types.TreeMap]) -> Iterable[tuple[types.Path, Unpack[list[types.OID]]]]:
     entries = defaultdict(lambda: [None] * len(trees))
     for i, tree in enumerate(trees):
         for path, oid in tree.items():
@@ -18,7 +18,7 @@ def compare_trees(*trees: Unpack[base.TreeMap]) -> Iterable[tuple[base.Path, Unp
         yield path, *oids
 
 
-def diff_trees(t_from: base.TreeMap, t_to: base.TreeMap) -> bytes:
+def diff_trees(t_from: types.TreeMap, t_to: types.TreeMap) -> bytes:
     output = b''
     for path, o_from, o_to in compare_trees(t_from, t_to):
         if o_from != o_to:
@@ -29,7 +29,8 @@ def diff_trees(t_from: base.TreeMap, t_to: base.TreeMap) -> bytes:
 Action: TypeAlias = Literal['new_file', 'deleted', 'modified']
 
 
-def iter_changed_files(t_from: base.TreeMap, t_to: base.TreeMap) -> Iterable[tuple[base.Path, Action]]:
+def iter_changed_files(t_from: types.TreeMap, t_to: types.TreeMap) -> Iterable[
+    tuple[types.Path, Action]]:
     for path, o_from, o_to in compare_trees(t_from, t_to):
         if o_from != o_to:
             action = ('new_file' if not o_from else
@@ -38,7 +39,7 @@ def iter_changed_files(t_from: base.TreeMap, t_to: base.TreeMap) -> Iterable[tup
             yield path, action
 
 
-def diff_blobs(o_from: base.OID, o_to: base.OID, path='blob'):
+def diff_blobs(o_from: types.OID, o_to: types.OID, path='blob'):
     with Temp() as f_from, Temp() as f_to:
         for oid, f in [(o_from, f_from), (o_to, f_to)]:
             if oid:
