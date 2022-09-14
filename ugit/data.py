@@ -1,10 +1,9 @@
 import os
 import hashlib
-from collections import namedtuple
+
+from ugit.types import RefValue
 
 GIT_DIR = '.ugit'
-
-RefValue = namedtuple('RefValue', ['symbolic', 'value'])
 
 
 def init():

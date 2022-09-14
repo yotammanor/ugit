@@ -4,6 +4,7 @@ import subprocess
 import sys
 import textwrap
 
+import ugit.types
 from . import data, diff
 from . import base
 
@@ -113,7 +114,7 @@ def commit_func(args):
 
 
 def log(args):
-    refs: dict[data.RefValue.value, list[str]] = {}
+    refs: dict[ugit.types.RefValue.value, list[str]] = {}
     for refname, ref in data.iter_refs():
         refs.setdefault(ref.value, []).append(refname)
 

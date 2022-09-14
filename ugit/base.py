@@ -1,5 +1,6 @@
 import string
 
+import ugit.types
 from . import data, diff
 from . import types
 
@@ -12,7 +13,7 @@ from collections import deque
 
 def init():
     data.init()
-    data.update_ref('HEAD', data.RefValue(symbolic=True, value='refs/heads/master'))
+    data.update_ref('HEAD', ugit.types.RefValue(symbolic=True, value='refs/heads/master'))
 
 
 def get_branch_name():
@@ -30,9 +31,9 @@ def checkout(name):
     read_tree(commit_.tree)
 
     if is_branch(name):
-        HEAD = data.RefValue(symbolic=True, value=f'refs/heads/{name}')
+        HEAD = ugit.types.RefValue(symbolic=True, value=f'refs/heads/{name}')
     else:
-        HEAD = data.RefValue(symbolic=False, value=oid)
+        HEAD = ugit.types.RefValue(symbolic=False, value=oid)
 
     data.update_ref("HEAD", HEAD, deref=False)
 
@@ -150,15 +151,15 @@ def _empty_current_directory():
 
 
 def reset(oid):
-    data.update_ref('HEAD', data.RefValue(symbolic=False, value=oid))
+    data.update_ref('HEAD', ugit.types.RefValue(symbolic=False, value=oid))
 
 
 def create_branch(name, oid):
-    data.update_ref(f'refs/heads/{name}', data.RefValue(symbolic=False, value=oid))
+    data.update_ref(f'refs/heads/{name}', ugit.types.RefValue(symbolic=False, value=oid))
 
 
 def create_tag(name, oid):
-    data.update_ref(f'refs/tags/{name}', data.RefValue(symbolic=False, value=oid))
+    data.update_ref(f'refs/tags/{name}', ugit.types.RefValue(symbolic=False, value=oid))
 
 
 def read_tree_merged(t_head: types.OID, t_other: types.OID) -> None:
@@ -191,7 +192,7 @@ def commit(message):
     commit_ += f'{message}\n'
 
     oid = data.hash_object(commit_.encode(), 'commit')
-    data.update_ref("HEAD", data.RefValue(symbolic=False, value=oid))
+    data.update_ref("HEAD", ugit.types.RefValue(symbolic=False, value=oid))
     return oid
 
 
