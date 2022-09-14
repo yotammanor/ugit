@@ -8,5 +8,5 @@ BlobTreeMap: TypeAlias = dict[Path, bytes]
 
 class Commit(NamedTuple):
     tree: OID
-    parent: OID
+    parents: list[OID]
     message: str
