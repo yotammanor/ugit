@@ -135,6 +135,11 @@ def get_working_tree() -> types.TreeMap:
     return result
 
 
+def get_index_tree():
+    with data.get_index() as index:
+        return index
+
+
 def read_tree(tree_oid, update_working=False):
     with data.get_index() as index:
         index.clear()
