@@ -185,6 +185,10 @@ def read_tree_merged(t_base: types.OID, t_head: types.OID, t_other: types.OID) -
             f.write(blob)
 
 
+def is_ancestor_of(commit_, maybe_ancestor):
+    return maybe_ancestor in iter_commits_and_parents({commit_})
+
+
 def merge(other):
     HEAD = data.get_ref('HEAD').value
     assert HEAD
