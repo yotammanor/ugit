@@ -255,7 +255,7 @@ def commit(message):
 
 
 def get_oid(name):
-    if name == '@':
+    if name == '@' or name == '':
         name = 'HEAD'
 
     refs_to_try = [

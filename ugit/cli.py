@@ -54,7 +54,8 @@ def parse_args():
 
     diff_parser = commands.add_parser('diff')
     diff_parser.set_defaults(func=diff_func)
-    diff_parser.add_argument('commit', default='@', type=oid, nargs='?')
+    diff_parser.add_argument('--cached', action='store_true')
+    diff_parser.add_argument('commit', nargs='?')
 
     checkout_parser = commands.add_parser('checkout')
     checkout_parser.set_defaults(func=checkout)
@@ -244,9 +245,25 @@ def reset(args):
 
 
 def diff_func(args):
-    tree = args.commit and base.get_commit(args.commit).tree
+    oid = args.commit and base.get_oid(args.commit)
 
-    result = diff.diff_trees(base.get_tree(tree), base.get_working_tree())
+    if args.commit:
+        # If a commit was provided explicitly, diff from it
+        tree_from = base.get_tree(oid and base.get_commit(oid).tree)
+
+    if args.cached:
+        tree_to = base.get_index_tree()
+        if not args.commit:
+            # If no commit was provided, diff from HEAD
+            oid = base.get_oid('@')
+            tree_from = base.get_tree(base.get_commit(oid).tree)
+    else:
+        tree_to = base.get_working_tree()
+        if not args.commit:
+            # If no commit was provided, diff from index
+            tree_from = base.get_index_tree()
+
+    result = diff.diff_trees(tree_from, tree_to)
     sys.stdout.flush()
     sys.stdout.buffer.write(result)
 
