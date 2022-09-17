@@ -170,9 +170,13 @@ def get_merge_base(oid1: types.OID, oid2: types.OID) -> types.OID:
             return oid
 
 
-def read_tree_merged(t_head: types.OID, t_other: types.OID) -> None:
+def read_tree_merged(t_base: types.OID, t_head: types.OID, t_other: types.OID) -> None:
     _empty_current_directory()
-    merged_tree = diff.merge_trees(get_tree(t_head), get_tree(t_other))
+    merged_tree = diff.merge_trees(
+        get_tree(t_base),
+        get_tree(t_head),
+        get_tree(t_other)
+    )
     for path, blob in merged_tree.items():
         os.makedirs(f'./{os.path.dirname(path)}', exist_ok=True)
         with open(path, 'wb') as f:
@@ -184,10 +188,10 @@ def merge(other):
     assert HEAD
     c_HEAD = get_commit(HEAD)
     c_other = get_commit(other)
-
+    c_base = get_commit(get_merge_base(other, HEAD))
     data.update_ref('MERGE_HEAD', data.RefValue(symbolic=False, value=other))
 
-    read_tree_merged(c_HEAD.tree, c_other.tree)
+    read_tree_merged(c_base.tree, c_HEAD.tree, c_other.tree)
     print('Merged in working tree\nPlease commit')
 
 
