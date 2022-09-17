@@ -56,6 +56,12 @@ def fetch_object_if_missing(oid, remote_git_dir):
                 f'{GIT_DIR}/objects/{oid}')
 
 
+def push_object(oid, remote_git_dir):
+    remote_git_dir += '/.ugit'
+    shutil.copy(f'{GIT_DIR}/objects/{oid}',
+                f'{remote_git_dir}/objects/{oid}')
+
+
 def update_ref(ref, value: RefValue, deref=True):
     ref = _get_ref_internal(ref, deref)[0]
 
