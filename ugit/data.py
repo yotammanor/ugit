@@ -1,14 +1,25 @@
 import os
 import hashlib
+from contextlib import contextmanager
 from typing import Iterable
 
 from ugit import types
 from ugit.types import RefValue
 
-GIT_DIR = '.ugit'
+GIT_DIR: str | None = None
+
+
+@contextmanager
+def change_git_dir(new_dir):
+    global GIT_DIR
+    old_dir = GIT_DIR
+    GIT_DIR = f'{new_dir}/.ugit'
+    yield
+    GIT_DIR = old_dir
 
 
 def init():
+    assert GIT_DIR is not None
     os.makedirs(GIT_DIR, exist_ok=True)
     os.makedirs(f'{GIT_DIR}/objects', exist_ok=True)
 
