@@ -1,6 +1,8 @@
 import os
 import hashlib
+from typing import Iterable
 
+from ugit import types
 from ugit.types import RefValue
 
 GIT_DIR = '.ugit'
@@ -68,8 +70,8 @@ def _get_ref_internal(ref: str, deref: bool) -> tuple[str, RefValue]:
     return ref, RefValue(symbolic=symbolic, value=value)
 
 
-def iter_refs(prefix='', deref=True):
-    refs = ['HEAD']
+def iter_refs(prefix='', deref=True) -> Iterable[tuple[str, types.RefValue]]:
+    refs = ['HEAD', 'MERGE_HEAD']
     for root, _, filenames in os.walk(f'{GIT_DIR}/refs/'):
         root = os.path.relpath(root, GIT_DIR).replace('\\', '/')
         refs.extend(f'{root}/{name}' for name in filenames)
@@ -77,4 +79,6 @@ def iter_refs(prefix='', deref=True):
     for refname in refs:
         if not refname.startswith(prefix):
             continue
-        yield refname, get_ref(refname, deref=deref)
+        ref = get_ref(refname, deref=deref)
+        if ref.value:
+            yield refname, ref
