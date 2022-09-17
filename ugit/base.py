@@ -162,6 +162,14 @@ def create_tag(name, oid):
     data.update_ref(f'refs/tags/{name}', ugit.types.RefValue(symbolic=False, value=oid))
 
 
+def get_merge_base(oid1: types.OID, oid2: types.OID) -> types.OID:
+    parents1 = set(iter_commits_and_parents({oid1}))
+
+    for oid in iter_commits_and_parents({oid2}):
+        if oid in parents1:
+            return oid
+
+
 def read_tree_merged(t_head: types.OID, t_other: types.OID) -> None:
     _empty_current_directory()
     merged_tree = diff.merge_trees(get_tree(t_head), get_tree(t_other))

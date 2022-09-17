@@ -83,6 +83,11 @@ def parse_args():
     merge_parser.set_defaults(func=merge_func)
     merge_parser.add_argument('commit', type=oid)
 
+    merge_base_parser = commands.add_parser('merge-base')
+    merge_base_parser.set_defaults(func=merge_base)
+    merge_base_parser.add_argument('commit1', type=oid)
+    merge_base_parser.add_argument('commit2', type=oid)
+
     return parser.parse_args()
 
 
@@ -209,6 +214,10 @@ def status(args):
     HEAD_tree = HEAD and base.get_commit(HEAD).tree
     for path, action in diff.iter_changed_files(base.get_tree(HEAD_tree), base.get_working_tree()):
         print(f'{action:>12}: {path}')
+
+
+def merge_base(args):
+    print(base.get_merge_base(args.commit1, args.commit2))
 
 
 def reset(args):
