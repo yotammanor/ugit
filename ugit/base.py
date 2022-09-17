@@ -288,6 +288,15 @@ def iter_objects_in_commits(oids):
             yield from iter_objects_in_tree(commit_.tree)
 
 
+def add(filenames):
+    with data.get_index() as index:
+        for filename in filenames:
+            # Normalize path
+            filename = os.path.relpath(filename)
+            with open(filename, 'rb') as f:
+                oid = data.hash_object(f.read())
+            index[filename] = oid
+
 def is_ignored(path):
     path = path.replace('\\', '/')
     return (

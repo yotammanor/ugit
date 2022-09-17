@@ -1,3 +1,4 @@
+import json
 import os
 import hashlib
 import shutil
@@ -23,6 +24,19 @@ def init():
     assert GIT_DIR is not None
     os.makedirs(GIT_DIR, exist_ok=True)
     os.makedirs(f'{GIT_DIR}/objects', exist_ok=True)
+
+
+@contextmanager
+def get_index():
+    index = {}
+    index_filepath = f'{GIT_DIR}/index'
+    if os.path.isfile(index_filepath):
+        with open(index_filepath) as f:
+            index = json.load(f)
+    yield index
+
+    with open(index_filepath, 'w') as f:
+        json.dump(index, f)
 
 
 def hash_object(data, type_='blob'):
