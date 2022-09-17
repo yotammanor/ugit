@@ -261,6 +261,26 @@ def iter_commits_and_parents(oids):
         oids.extend(commit_.parents[1:])
 
 
+def iter_objects_in_commits(oids):
+    visited = set()
+
+    def iter_objects_in_tree(source_tree_oid):
+        visited.add(source_tree_oid)
+        yield source_tree_oid
+        for type_, oid_, _ in _iter_tree_entries(source_tree_oid):
+            if oid_ not in visited:
+                if type_ == 'tree':
+                    yield from iter_objects_in_tree(oid_)
+                else:
+                    visited.add(oid_)
+                    yield oid_
+
+    for oid in iter_commits_and_parents(oids):
+        yield oid
+        commit_ = get_commit(oid)
+        if commit_.tree not in visited:
+            yield from iter_objects_in_tree(commit_.tree)
+
 def is_ignored(path):
     path = path.replace('\\', '/')
     return (
