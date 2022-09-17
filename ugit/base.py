@@ -169,6 +169,8 @@ def get_merge_base(oid1: types.OID, oid2: types.OID) -> types.OID:
         if oid in parents1:
             return oid
 
+    assert False, "A merge base must exist"
+
 
 def read_tree_merged(t_base: types.OID, t_head: types.OID, t_other: types.OID) -> None:
     _empty_current_directory()
@@ -280,6 +282,7 @@ def iter_objects_in_commits(oids):
         commit_ = get_commit(oid)
         if commit_.tree not in visited:
             yield from iter_objects_in_tree(commit_.tree)
+
 
 def is_ignored(path):
     path = path.replace('\\', '/')
