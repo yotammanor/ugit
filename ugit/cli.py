@@ -105,7 +105,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def init(args):
+def init(_):
     base.init()
     print(f'Initialized empty ugit repository in {os.getcwd()}/{data.GIT_DIR}')
 

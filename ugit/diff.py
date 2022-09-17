@@ -57,10 +57,11 @@ def diff_blobs(o_from: types.OID, o_to: types.OID, path='blob'):
         return output
 
 
-def merge_trees(t_base: types.TreeMap, t_head: types.TreeMap, t_other: types.TreeMap) -> types.BlobTreeMap:
+def merge_trees(t_base: types.TreeMap, t_head: types.TreeMap, t_other: types.TreeMap) -> types.TreeMap:
     tree = {}
     for path, o_base, o_HEAD, o_other in compare_trees(t_base, t_head, t_other):
-        tree[path] = merge_blobs(o_base, o_HEAD, o_other)
+        merged_obj = merge_blobs(o_base, o_HEAD, o_other)
+        tree[path] = data.hash_object(merged_obj)
     return tree
 
 

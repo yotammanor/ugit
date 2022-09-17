@@ -28,7 +28,7 @@ def get_branch_name():
 def checkout(name):
     oid = get_oid(name)
     commit_ = get_commit(oid)
-    read_tree(commit_.tree)
+    read_tree(commit_.tree, update_working=True)
 
     if is_branch(name):
         HEAD = ugit.types.RefValue(symbolic=True, value=f'refs/heads/{name}')
@@ -135,12 +135,34 @@ def get_working_tree() -> types.TreeMap:
     return result
 
 
-def read_tree(tree_oid):
+def read_tree(tree_oid, update_working=False):
+    with data.get_index() as index:
+        index.clear()
+        index.update(get_tree(tree_oid))
+
+        if update_working:
+            _checkout_index(index)
+
+
+def read_tree_merged(t_base: types.OID, t_head: types.OID, t_other: types.OID, update_working: bool = False) -> None:
+    with data.get_index() as index:
+        index.clear()
+        merged_tree = diff.merge_trees(
+            get_tree(t_base),
+            get_tree(t_head),
+            get_tree(t_other)
+        )
+        index.update(merged_tree)
+        if update_working:
+            _checkout_index(index)
+
+
+def _checkout_index(index):
     _empty_current_directory()
-    for path, oid in get_tree(tree_oid, base_path='./').items():
-        os.makedirs(os.path.dirname(path), exist_ok=True)
+    for path, oid in index.items():
+        os.makedirs(os.path.dirname(f'./{path}'), exist_ok=True)
         with open(path, 'wb') as f:
-            f.write(data.get_object(oid))
+            f.write(data.get_object(oid, 'blob'))
 
 
 def _empty_current_directory():
@@ -182,19 +204,6 @@ def get_merge_base(oid1: types.OID, oid2: types.OID) -> types.OID:
     assert False, "A merge base must exist"
 
 
-def read_tree_merged(t_base: types.OID, t_head: types.OID, t_other: types.OID) -> None:
-    _empty_current_directory()
-    merged_tree = diff.merge_trees(
-        get_tree(t_base),
-        get_tree(t_head),
-        get_tree(t_other)
-    )
-    for path, blob in merged_tree.items():
-        os.makedirs(f'./{os.path.dirname(path)}', exist_ok=True)
-        with open(path, 'wb') as f:
-            f.write(blob)
-
-
 def is_ancestor_of(commit_, maybe_ancestor):
     return maybe_ancestor in iter_commits_and_parents({commit_})
 
@@ -206,7 +215,7 @@ def merge(other):
     merge_base = get_merge_base(other, HEAD)
 
     if merge_base == HEAD:
-        read_tree(c_other.tree)
+        read_tree(c_other.tree, update_working=True)
         data.update_ref('HEAD',
                         data.RefValue(symbolic=False, value=other))
         print('Fast-forward merge, no need to commit')
@@ -216,7 +225,7 @@ def merge(other):
 
     c_base = get_commit(merge_base)
     c_HEAD = get_commit(HEAD)
-    read_tree_merged(c_base.tree, c_HEAD.tree, c_other.tree)
+    read_tree_merged(c_base.tree, c_HEAD.tree, c_other.tree, update_working=True)
     print('Merged in working tree\nPlease commit')
 
 

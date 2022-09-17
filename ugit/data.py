@@ -39,7 +39,7 @@ def get_index():
         json.dump(index, f)
 
 
-def hash_object(data, type_='blob'):
+def hash_object(data: bytes, type_: types.ObjectType = 'blob') -> types.OID:
     obj = type_.encode() + b'\x00' + data
     oid = hashlib.sha1(data).hexdigest()
     with open(f'{GIT_DIR}/objects/{oid}', 'wb') as out:

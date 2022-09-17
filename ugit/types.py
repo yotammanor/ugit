@@ -1,10 +1,9 @@
-from typing import TypeAlias, NamedTuple
+from typing import TypeAlias, NamedTuple, Literal
 
 Path: TypeAlias = str  # a path in the filesystem
 OID: TypeAlias = str  # hash
 TreeMap: TypeAlias = dict[Path, OID]
-BlobTreeMap: TypeAlias = dict[Path, bytes]
-
+ObjectType: TypeAlias = Literal['blob', 'tree', 'commit']
 
 class Commit(NamedTuple):
     tree: OID
