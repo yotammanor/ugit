@@ -21,7 +21,7 @@ def get_branch_name():
     if not HEAD.symbolic:
         return None
     HEAD = HEAD.value
-    assert HEAD.startswith('refs/heads'), f'expected HEAD to start with "refs/heads", found {HEAD.value}'
+    assert HEAD.startswith('refs/heads'), f'expected HEAD to start with "refs/heads", found {HEAD}'
     return os.path.relpath(HEAD, 'refs/heads')
 
 
